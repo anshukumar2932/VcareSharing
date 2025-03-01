@@ -1,161 +1,521 @@
-### **Roadmap for Frontend Development**
+## **Step-by-Step Development Roadmap**  
 
-#### **Phase 1: Planning & Design**
-- **1.1 Requirements Gathering**  
-  - List all frontend features (e.g., booking form, seat availability display, user dashboard).  
-  - Prioritize responsive design for mobile users.  
-
-- **1.2 UI/UX Design**  
-  - Create wireframes for:  
-    - Homepage (Value Proposition, CTAs, Testimonials).  
-    - Booking System (Route selection, time slots, seat availability).  
-    - User Dashboard (Booking history, cancellations).  
-    - Information Pages (FAQs, Safety, Routes).  
-  - Develop high-fidelity designs with tools like Figma or Adobe XD.
-
-#### **Phase 2: Development**
-- **2.1 Setup Development Environment**  
-  - Use a modern framework like **React.js**, **Vue.js**, or **Angular**.  
-  - Set up project scaffolding with tools like Create React App or Vue CLI.  
-
-- **2.2 Implement Core Pages**  
-  - **Homepage**:  
-    - Add clear navigation, CTAs, and a “How It Works” section.  
-    - Include testimonial and trust element sections.  
-  - **Booking System**:  
-    - Create forms for route and time selection with dynamic dropdowns.  
-    - Display seat availability in real-time (integrate with backend API).  
-    - Add payment selection and confirmation modals.  
-  - **User Dashboard**:  
-    - Implement tabs for upcoming/past bookings, receipts, and referral codes.  
-
-- **2.3 Responsive Design**  
-  - Ensure layouts are responsive using CSS frameworks like **Bootstrap** or **Tailwind CSS**.  
-  - Test for mobile-first compatibility.  
-
-- **2.4 Testing**  
-  - Use tools like **Storybook** for component testing.  
-  - Perform browser compatibility testing (Chrome, Safari, Firefox).  
-
-#### **Phase 3: Deployment**  
-- Deploy the frontend to a hosting service like **Vercel**, **Netlify**, or **AWS S3**.
+Since you're using an API for managing seat availability, it's best to develop the **backend first** so the frontend can consume the APIs during development. This will ensure smooth integration and reduce potential rework.  
 
 ---
 
-### **Roadmap for Backend Development (Python-Based)**  
+# **🛠 Phase 1: Backend Development (Step-by-Step)**
+### **Goal:** Build a Python-based backend that manages user authentication, booking system, seat availability, payments, and notifications.  
 
-#### **Phase 1: Planning & Architecture**  
-- **1.1 Define Backend Requirements**  
-  - Core functionality: Booking management, seat availability updates, notifications, user authentication.  
-  - APIs: For real-time seat availability, user data management, and payment processing.  
-  - Ensure the system is scalable and secure.  
-
-- **1.2 Choose Tech Stack**  
-  - **Language**: Python.  
-  - **Framework**: Django (for a full-stack approach) or Flask/FastAPI (for lightweight, API-focused development).  
-  - **Database**:  
-    - **PostgreSQL**: For structured data like bookings and user details.  
-    - **Redis**: For caching real-time data (e.g., seat availability).  
-  - **Task Queue**: Celery with RabbitMQ or Redis for handling asynchronous tasks (e.g., sending notifications).  
-  - **Hosting**: AWS EC2, Heroku, or Google Cloud Platform.  
-
-- **1.3 Database Design**  
-  - Design schema/tables:  
-    - **Users**: Name, email, phone, gender, password (hashed), referral code.  
-    - **Rides**: Route, time slots, seat availability, price, status (active/completed).  
-    - **Bookings**: User ID, ride ID, number of seats, payment status, booking timestamp.  
+## **🔹 Step 1: Define Backend Requirements**
+✅ **Core Features:**  
+   - User authentication (Sign-up/Login).  
+   - Ride management (Routes, time slots, seat availability).  
+   - Booking system (Reserving/canceling seats).  
+   - Payment integration (Stripe/Razorpay).  
+   - Notifications (Email/SMS reminders).  
+   - Admin dashboard APIs (for managing rides & users).  
 
 ---
 
-#### **Phase 2: Core Backend Development**  
+## **🔹 Step 2: Set Up the Development Environment**  
+✅ **Choose Stack:**  
+   - **Framework:** Django (for full-stack) or FastAPI (for API-only).  
+   - **Database:** PostgreSQL (main DB) + Redis (for caching seat availability).  
+   - **Task Queue:** Celery + Redis (for async tasks like email/sms).  
+   - **Hosting:** AWS EC2, Google Cloud, or Heroku.  
 
-##### **2.1 User Authentication**  
-- Implement sign-up/login functionality using **Django Authentication** or a custom JWT-based system (e.g., PyJWT).  
-- Use bcrypt or Django’s built-in password hashing for secure user authentication.  
-- Provide endpoints for:  
-  - Sign-up.  
-  - Login.  
-  - Password reset (email-based).  
-
-##### **2.2 Booking Management**  
-- Develop APIs for booking features:  
-  - **Fetch Available Rides**: Query the database for available routes, time slots, and seat counts.  
-  - **Create Booking**: Reserve seats and deduct availability in real-time.  
-  - **Cancel Booking**: Update seat availability and handle refund workflows.  
-  - **Modify Booking**: Allow users to reschedule rides if policy allows.  
-
-##### **2.3 Notifications & Updates**  
-- Use **Twilio** or **SendGrid** for email/SMS notifications.  
-- Configure Celery to handle asynchronous tasks for:  
-  - Sending booking confirmations.  
-  - Sending reminders before rides.  
-  - Broadcasting updates in case of delays or changes.  
-
-##### **2.4 Payment Integration**  
-- Integrate payment gateways like **Razorpay**, **Stripe**, or **PayPal** using their Python SDKs.  
-- Implement payment-related endpoints:  
-  - **Initiate Payment**: Generate a payment link or handle in-app payments.  
-  - **Verify Payment**: Ensure transactions are completed before confirming bookings.  
-  - **Refund Handling**: Automate refunds based on the cancellation policy.  
-
-##### **2.5 Admin Dashboard API**  
-- Build backend APIs for admin tasks:  
-  - **View Bookings**: Query and display booking data.  
-  - **Manage Rides**: Update seat availability, create new routes, and deactivate rides.  
-  - **Generate Reports**: Provide revenue insights, usage statistics, and feedback summaries.  
+✅ **Install Required Packages:**  
+```sh
+pip install django djangorestframework django-cors-headers djangorestframework-simplejwt psycopg2-binary gunicorn celery redis stripe
+```  
+✅ **Create Project & App:**  
+```sh
+django-admin startproject backend  
+cd backend  
+django-admin startapp api  
+```  
 
 ---
 
-#### **Phase 3: Testing**  
+## **🔹 Step 3: Design Database Schema**  
+✅ **Models for Users, Rides, Bookings, and Payments:**  
 
-##### **3.1 Unit Testing**  
-- Write unit tests for all core APIs using **Pytest** or Django’s testing framework.  
-- Test booking logic, authentication workflows, and notifications.  
+```python
+from django.db import models
+from django.contrib.auth.models import AbstractUser
 
-##### **3.2 Integration Testing**  
-- Test API interactions with frontend or Postman/Swagger for end-to-end validation.  
-- Verify real-time updates like seat availability and booking status.  
+class User(AbstractUser):
+    phone = models.CharField(max_length=15, unique=True)
+    referral_code = models.CharField(max_length=10, unique=True, null=True, blank=True)
 
-##### **3.3 Security Testing**  
-- Ensure security for sensitive endpoints (e.g., authentication and payments) using:  
-  - HTTPS for secure API communication.  
-  - Token-based authentication for APIs.  
+class Ride(models.Model):
+    route = models.CharField(max_length=255)
+    time_slot = models.TimeField()
+    total_seats = models.IntegerField()
+    available_seats = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
----
+class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    ride = models.ForeignKey(Ride, on_delete=models.CASCADE)
+    num_seats = models.IntegerField()
+    payment_status = models.CharField(max_length=10, choices=[('Pending', 'Pending'), ('Paid', 'Paid')])
 
-#### **Phase 4: Deployment**  
-- **4.1 Containerization**  
-  - Use Docker to create containers for the backend and its dependencies.  
-- **4.2 Deployment on Cloud**  
-  - Deploy the backend on **AWS EC2**, **Google Cloud**, or **Heroku**.  
-  - Configure database hosting using **AWS RDS** or **Google Cloud SQL**.  
+class Payment(models.Model):
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
+    transaction_id = models.CharField(max_length=255, unique=True)
+    status = models.CharField(max_length=10, choices=[('Success', 'Success'), ('Failed', 'Failed')])
+```  
 
-##### **4.3 CI/CD**  
-- Use GitHub Actions or Jenkins to automate testing and deployment.  
-
----
-
-#### **Phase 5: Optimization & Monitoring**  
-- **5.1 Performance Optimization**  
-  - Use **Gunicorn** or **uWSGI** for serving the backend with better concurrency.  
-  - Set up caching (e.g., Redis) for frequently accessed data like routes and seat availability.  
-
-- **5.2 Monitoring & Logging**  
-  - Use tools like **Sentry** or **Prometheus** for error tracking and performance monitoring.  
-  - Implement structured logging using **Loguru** or **Python’s logging module**.  
+✅ **Run Migrations:**  
+```sh
+python manage.py makemigrations  
+python manage.py migrate  
+```  
 
 ---
 
-### **Deliverables**  
-- RESTful API endpoints for all functionalities.  
-- Backend integrated with payment and notification services.  
-- Deployed backend with a scalable and secure infrastructure.  
+## **🔹 Step 4: Implement Authentication (JWT-Based)**
+✅ **Install JWT Authentication:**  
+```sh
+pip install djangorestframework-simplejwt
+```  
+✅ **Modify `settings.py`:**  
+```python
+INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'api',
+]
 
-This roadmap ensures a robust Python-based backend tailored to the specific requirements of your service.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
-### **Integration Plan**
-- Test communication between frontend and backend using APIs.  
-- Validate real-time data (e.g., seat availability, booking updates).  
-- Conduct end-to-end testing to ensure a seamless user experience.  
+AUTH_USER_MODEL = 'api.User'
+```  
+✅ **Create API Endpoints (`views.py`):**  
 
-This phased roadmap ensures clarity and efficiency in developing the frontend and backend while prioritizing the needs of your target audience.
+```python
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.contrib.auth import authenticate
+from .models import User
+
+@api_view(['POST'])
+def register(request):
+    user = User.objects.create_user(
+        username=request.data['email'],
+        email=request.data['email'],
+        password=request.data['password'],
+        phone=request.data['phone']
+    )
+    return Response({'message': 'User registered successfully'})
+
+@api_view(['POST'])
+def login(request):
+    user = authenticate(username=request.data['email'], password=request.data['password'])
+    if user:
+        refresh = RefreshToken.for_user(user)
+        return Response({'refresh': str(refresh), 'access': str(refresh.access_token)})
+    return Response({'error': 'Invalid credentials'}, status=400)
+```  
+
+---
+
+## **🔹 Step 5: Implement Booking Management**  
+✅ **API Endpoints:**  
+
+```python
+@api_view(['GET'])
+def get_rides(request):
+    rides = Ride.objects.all()
+    return Response([{"id": ride.id, "route": ride.route, "available_seats": ride.available_seats} for ride in rides])
+
+@api_view(['POST'])
+def create_booking(request):
+    ride = Ride.objects.get(id=request.data['ride_id'])
+    if ride.available_seats >= request.data['num_seats']:
+        ride.available_seats -= request.data['num_seats']
+        ride.save()
+        booking = Booking.objects.create(
+            user=request.user, ride=ride, num_seats=request.data['num_seats'], payment_status="Pending"
+        )
+        return Response({"message": "Booking created", "booking_id": booking.id})
+    return Response({"error": "Not enough seats"}, status=400)
+```  
+
+---
+
+## **🔹 Step 6: Implement Seat Availability API (Real-time Updates using Redis)**  
+✅ **Install Redis:**  
+```sh
+sudo apt update && sudo apt install redis  
+pip install django-redis
+```  
+✅ **Modify `settings.py`:**  
+```python
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
+}
+```  
+✅ **Use Redis for Seat Availability Caching:**  
+
+```python
+from django.core.cache import cache
+
+@api_view(['GET'])
+def get_seat_availability(request, ride_id):
+    available_seats = cache.get(f"ride_{ride_id}_seats")
+    if available_seats is None:
+        ride = Ride.objects.get(id=ride_id)
+        available_seats = ride.available_seats
+        cache.set(f"ride_{ride_id}_seats", available_seats, timeout=60)
+    return Response({"available_seats": available_seats})
+```  
+
+---
+
+## **🔹 Step 7: Integrate Payment System (Stripe API)**
+✅ **Install Stripe:**  
+```sh
+pip install stripe
+```  
+✅ **Create Payment API:**  
+
+```python
+import stripe
+from django.conf import settings
+
+stripe.api_key = "YOUR_STRIPE_SECRET_KEY"
+
+@api_view(['POST'])
+def create_payment(request):
+    booking = Booking.objects.get(id=request.data['booking_id'])
+    session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'usd',
+                'product_data': {'name': booking.ride.route},
+                'unit_amount': int(booking.ride.price * 100),
+            },
+            'quantity': booking.num_seats,
+        }],
+        mode='payment',
+        success_url=settings.SITE_URL + "/success",
+        cancel_url=settings.SITE_URL + "/cancel",
+    )
+    return Response({"session_id": session.id})
+```  
+
+---
+
+## **🔹 Step 8: Testing**
+✅ **Test APIs using Postman**  
+✅ **Write Unit Tests using Pytest**  
+
+---
+
+## **🔹 Step 9: Deploy Backend**  
+✅ **Use Docker:**  
+```sh
+docker build -t my-backend .  
+docker run -p 8000:8000 my-backend  
+```  
+✅ **Deploy on AWS/GCP/Heroku**  
+✅ **Use CI/CD (GitHub Actions)**  
+
+---
+
+# **🚀 Phase 2: Frontend Development (Step-by-Step)**
+## **Goal:** Build a responsive React frontend that interacts with the backend APIs for authentication, booking, seat availability, and payments.  
+
+---
+
+## **🔹 Step 1: Set Up React Development Environment**  
+
+✅ **Install Node.js & Create React App:**  
+```sh
+npx create-react-app frontend  
+cd frontend  
+```
+
+✅ **Install Dependencies:**  
+```sh
+npm install axios react-router-dom @mui/material @emotion/react @emotion/styled react-toastify redux react-redux @reduxjs/toolkit jwt-decode
+```  
+
+✅ **Project Structure:**  
+```
+frontend/
+│── src/
+│   ├── components/      # Reusable UI components
+│   ├── pages/           # Page components
+│   ├── store/           # Redux store
+│   ├── services/        # API calls
+│   ├── App.js           # Main application
+│   ├── index.js         # Entry point
+```
+
+---
+
+## **🔹 Step 2: Configure Routing (React Router)**  
+✅ **Install React Router:**  
+```sh
+npm install react-router-dom
+```
+
+✅ **Update `App.js`:**  
+```jsx
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Booking from "./pages/Booking";
+import Dashboard from "./pages/Dashboard";
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/booking" element={<Booking />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+```
+
+---
+
+## **🔹 Step 3: Implement Authentication (JWT-Based)**
+✅ **Create `services/authService.js`:**  
+```jsx
+import axios from "axios";
+
+const API_URL = "http://localhost:8000/api";
+
+export const login = async (email, password) => {
+  const response = await axios.post(`${API_URL}/login/`, { email, password });
+  localStorage.setItem("token", response.data.access);
+  return response.data;
+};
+
+export const register = async (email, password, phone) => {
+  return axios.post(`${API_URL}/register/`, { email, password, phone });
+};
+
+export const logout = () => {
+  localStorage.removeItem("token");
+};
+```
+
+✅ **Create `store/authSlice.js` for Redux State Management:**  
+```jsx
+import { createSlice } from "@reduxjs/toolkit";
+import jwtDecode from "jwt-decode";
+
+const token = localStorage.getItem("token");
+
+const initialState = {
+  user: token ? jwtDecode(token) : null,
+  isAuthenticated: !!token,
+};
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState,
+  reducers: {
+    loginSuccess: (state, action) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+    },
+    logoutSuccess: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+    },
+  },
+});
+
+export const { loginSuccess, logoutSuccess } = authSlice.actions;
+export default authSlice.reducer;
+```
+
+✅ **Wrap App in Redux Provider (`index.js`):**  
+```jsx
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "./store/authSlice";
+
+const store = configureStore({ reducer: { auth: authReducer } });
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById("root")
+);
+```
+
+---
+
+## **🔹 Step 4: Implement UI Pages**
+✅ **Login Page (`pages/Login.js`)**
+```jsx
+import { useState } from "react";
+import { login } from "../services/authService";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../store/authSlice";
+import { useNavigate } from "react-router-dom";
+
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await login(email, password);
+      dispatch(loginSuccess(data));
+      navigate("/dashboard");
+    } catch (error) {
+      alert("Login failed!");
+    }
+  };
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleLogin}>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
+};
+
+export default Login;
+```
+
+---
+
+## **🔹 Step 5: Implement Booking System**
+✅ **Fetch Available Rides (`services/bookingService.js`)**  
+```jsx
+import axios from "axios";
+
+const API_URL = "http://localhost:8000/api";
+
+export const getAvailableRides = async () => {
+  return axios.get(`${API_URL}/rides/`);
+};
+
+export const bookRide = async (rideId, numSeats) => {
+  const token = localStorage.getItem("token");
+  return axios.post(
+    `${API_URL}/bookings/`,
+    { ride_id: rideId, num_seats: numSeats },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+};
+```
+
+✅ **Booking Page (`pages/Booking.js`)**  
+```jsx
+import { useEffect, useState } from "react";
+import { getAvailableRides, bookRide } from "../services/bookingService";
+
+const Booking = () => {
+  const [rides, setRides] = useState([]);
+  const [selectedRide, setSelectedRide] = useState(null);
+  const [numSeats, setNumSeats] = useState(1);
+
+  useEffect(() => {
+    getAvailableRides().then((res) => setRides(res.data));
+  }, []);
+
+  const handleBooking = async () => {
+    if (selectedRide) {
+      await bookRide(selectedRide, numSeats);
+      alert("Booking confirmed!");
+    }
+  };
+
+  return (
+    <div>
+      <h2>Select a Ride</h2>
+      <select onChange={(e) => setSelectedRide(e.target.value)}>
+        {rides.map((ride) => (
+          <option key={ride.id} value={ride.id}>{`${ride.route} - ${ride.available_seats} seats left`}</option>
+        ))}
+      </select>
+      <input type="number" value={numSeats} onChange={(e) => setNumSeats(e.target.value)} />
+      <button onClick={handleBooking}>Book Now</button>
+    </div>
+  );
+};
+
+export default Booking;
+```
+
+---
+
+## **🔹 Step 6: Implement Payments (Stripe Checkout)**
+✅ **Modify `bookingService.js`:**  
+```jsx
+export const createPayment = async (bookingId) => {
+  return axios.post(`${API_URL}/payments/`, { booking_id: bookingId });
+};
+```
+
+✅ **Update `Booking.js` to handle payments:**  
+```jsx
+const handlePayment = async () => {
+  const response = await createPayment(selectedBookingId);
+  window.location.href = response.data.session_url; // Redirect to Stripe checkout
+};
+```
+
+---
+
+## **🔹 Step 7: Responsive Design with Material UI**
+✅ **Install Material UI:**  
+```sh
+npm install @mui/material @mui/icons-material
+```
+
+✅ **Use Material UI Components:**  
+```jsx
+import { Button, TextField, Card, CardContent } from "@mui/material";
+```
+
+---
+
+## **🔹 Step 8: Testing & Deployment**
+✅ **Test in Multiple Browsers (Chrome, Safari, Firefox)**  
+✅ **Deploy Frontend on Vercel/Netlify**  
+```sh
+npm run build  
+```
+✅ **Connect Frontend to Backend & Run End-to-End Tests**  
+
+---
+
+🎉 **Final Step: Full System Integration!**  
+✅ **Test the complete flow from user login → booking → payment → confirmation.** 🚀
